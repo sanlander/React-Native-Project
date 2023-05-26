@@ -6,14 +6,11 @@ import {
   ImageBackground,
   TextInput,
   TouchableOpacity,
-  Image,
   Platform,
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
   Dimensions,
-  Alert,
-  Linking,
 } from "react-native";
 
 import { useFonts } from "expo-font";
@@ -26,12 +23,10 @@ const initialState = {
   password: "",
 };
 
-const loginURL = "https://google.com.ua";
-
-export default function LoginScreen() {
+export const LoginScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({
-    Roboto_500: require("../assets/fonts/Roboto-Medium.ttf"),
-    Roboto_400: require("../assets/fonts/Roboto-Regular.ttf"),
+    Roboto_500: require("../../assets/fonts/Roboto-Medium.ttf"),
+    Roboto_400: require("../../assets/fonts/Roboto-Regular.ttf"),
   });
   const [dimensions, setDimensions] = useState(
     Dimensions.get("window").width - 16 * 2
@@ -62,9 +57,11 @@ export default function LoginScreen() {
   }
 
   const onPressSubmit = () => {
+    navigation.push("Home");
+
     onPressWithoutFeedback();
 
-    console.log(state);
+    console.log("Submit login:", state);
     setState(initialState);
   };
 
@@ -78,29 +75,6 @@ export default function LoginScreen() {
     setIsSecurePassword(true);
   }
 
-  const OpenURLButton = ({ url, children }) => {
-    const handlePress = useCallback(async () => {
-      // Checking if the link is supported for links with custom URL scheme.
-      const supported = await Linking.canOpenURL(url);
-
-      if (supported) {
-        // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-        // by some browser in the mobile
-        await Linking.openURL(url);
-      } else {
-        Alert.alert(`Don't know how to open this URL: ${url}`);
-      }
-    }, [url]);
-
-    return (
-      <TouchableOpacity>
-        <Text onPress={handlePress} style={styles.linkText}>
-          {children}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <TouchableWithoutFeedback
       onPress={onPressWithoutFeedback}
@@ -109,7 +83,7 @@ export default function LoginScreen() {
       <View style={styles.container}>
         <ImageBackground
           style={styles.image}
-          source={require("../assets/images/Photo-BG.jpg")}
+          source={require("../../assets/images/Photo-BG.jpg")}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : ""}
@@ -205,9 +179,14 @@ export default function LoginScreen() {
                   marginBottom: isShowKeyboard ? 15 : 144,
                 }}
               >
-                <OpenURLButton url={loginURL}>
-                  Немає акаунта? Зареєструватися
-                </OpenURLButton>
+                <TouchableOpacity>
+                  <Text
+                    onPress={() => navigation.push("Register")}
+                    style={styles.linkText}
+                  >
+                    Немає акаунта? Зареєструватися
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </KeyboardAvoidingView>
@@ -215,7 +194,7 @@ export default function LoginScreen() {
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -237,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
-    headerTitle: {
+  headerTitle: {
     color: "#212121",
     fontSize: 30,
     fontFamily: "Roboto_500",

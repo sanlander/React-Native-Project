@@ -12,8 +12,6 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Dimensions,
-  Alert,
-  Linking,
 } from "react-native";
 
 import { useFonts } from "expo-font";
@@ -27,12 +25,10 @@ const initialState = {
   password: "",
 };
 
-const loginURL = "https://google.com.ua";
-
-export default function RegistrationScreen() {
+export const RegistrationScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({
-    Roboto_500: require("../assets/fonts/Roboto-Medium.ttf"),
-    Roboto_400: require("../assets/fonts/Roboto-Regular.ttf"),
+    Roboto_500: require("../../assets/fonts/Roboto-Medium.ttf"),
+    Roboto_400: require("../../assets/fonts/Roboto-Regular.ttf"),
   });
   const [dimensions, setDimensions] = useState(
     Dimensions.get("window").width - 16 * 2
@@ -63,9 +59,10 @@ export default function RegistrationScreen() {
   }
 
   const onPressSubmit = () => {
+    navigation.push("Home");
     onPressWithoutFeedback();
 
-    console.log(state);
+    console.log("Submit register:", state);
     setState(initialState);
   };
 
@@ -79,29 +76,6 @@ export default function RegistrationScreen() {
     setIsSecurePassword(true);
   }
 
-  const OpenURLButton = ({ url, children }) => {
-    const handlePress = useCallback(async () => {
-      // Checking if the link is supported for links with custom URL scheme.
-      const supported = await Linking.canOpenURL(url);
-
-      if (supported) {
-        // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-        // by some browser in the mobile
-        await Linking.openURL(url);
-      } else {
-        Alert.alert(`Don't know how to open this URL: ${url}`);
-      }
-    }, [url]);
-
-    return (
-      <TouchableOpacity>
-        <Text onPress={handlePress} style={styles.linkText}>
-          {children}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <TouchableWithoutFeedback
       onPress={onPressWithoutFeedback}
@@ -110,7 +84,7 @@ export default function RegistrationScreen() {
       <View style={styles.container}>
         <ImageBackground
           style={styles.image}
-          source={require("../assets/images/Photo-BG.jpg")}
+          source={require("../../assets/images/Photo-BG.jpg")}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : ""}
@@ -119,7 +93,7 @@ export default function RegistrationScreen() {
               <View style={styles.headerLogo}>
                 <Image
                   style={styles.headerAddLogoBtn}
-                  source={require("../assets/images/add.png")}
+                  source={require("../../assets/images/add.png")}
                 ></Image>
                 <Text>logo user</Text>
               </View>
@@ -238,9 +212,14 @@ export default function RegistrationScreen() {
                   marginBottom: isShowKeyboard ? 5 : 78,
                 }}
               >
-                <OpenURLButton url={loginURL}>
-                  Уже є аккаунт? Увійти
-                </OpenURLButton>
+                <TouchableOpacity>
+                  <Text
+                    onPress={() => navigation.push("Login")}
+                    style={styles.linkText}
+                  >
+                    Уже є аккаунт? Увійти
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </KeyboardAvoidingView>
@@ -248,7 +227,7 @@ export default function RegistrationScreen() {
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
