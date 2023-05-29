@@ -25,7 +25,7 @@ const initialState = {
   password: "",
 };
 
-export const RegistrationScreen = ({ navigation }) => {
+export default RegistrationScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({
     Roboto_500: require("../../assets/fonts/Roboto-Medium.ttf"),
     Roboto_400: require("../../assets/fonts/Roboto-Regular.ttf"),

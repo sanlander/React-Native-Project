@@ -23,7 +23,7 @@ const initialState = {
   password: "",
 };
 
-export const LoginScreen = ({ navigation }) => {
+export default LoginScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({
     Roboto_500: require("../../assets/fonts/Roboto-Medium.ttf"),
     Roboto_400: require("../../assets/fonts/Roboto-Regular.ttf"),

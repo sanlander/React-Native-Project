@@ -2,13 +2,13 @@ import React from "react";
 import { StyleSheet, Image, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
-import { ProfileScreen } from "./ProfileScreen";
-import { PostsScreen } from "./PostsScreen";
-import { CreatePostsScreen } from "./CreatePostsScreen";
+import ProfileScreen from "./ProfileScreen";
+import PostsScreen from "./PostsScreen";
+import CreatePostsScreen from "./CreatePostsScreen";
 
 const MainTab = createBottomTabNavigator();
 
-export const Home = ({ navigation }) => {
+export default Home = ({ navigation }) => {
   return (
     <MainTab.Navigator
       screenOptions={{

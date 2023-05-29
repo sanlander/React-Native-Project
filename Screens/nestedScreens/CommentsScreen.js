@@ -1,13 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-export default ProfileScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text>profileScreen</Text>
-    </View>
-  );
-};
+const CommentsScreen = () => (
+  <View style={styles.container}>
+    <Text>CommentsScreen</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -16,3 +14,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default CommentsScreen;

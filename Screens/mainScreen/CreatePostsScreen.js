@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,40 +11,116 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Camera } from "expo-camera";
+import * as Location from "expo-location";
 
-const initialState = {
-  title: "",
-  location: "",
-};
-
-export const CreatePostsScreen = () => {
-  const [state, setState] = useState(initialState);
+export default CreatePostsScreen = ({ navigation }) => {
+  const [isReadyPost, setIsReadyPost] = useState(true);
+  const [hasPermission, setHasPermission] = useState(null);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const [camera, setCamera] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [adress, setAdress] = useState(null);
+  const [loader, setLoader] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+    })();
+  }, []);
+
+  const takePhoto = async () => {
+    setLoader(true);
+    Keyboard.dismiss();
+
+    const photo = await camera.takePictureAsync();
+    setPhoto(photo.uri);
+
+    let location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    setLocation(coords);
+
+    const currentAdress = await Location.reverseGeocodeAsync(coords);
+    setAdress(currentAdress[0]);
+
+    setIsReadyPost(false);
+    setLoader(false);
+  };
 
   const onPressSubmit = () => {
     onPressWithoutFeedback();
+    navigation.navigate("DefaultScreen", { photo, location, adress });
 
-    // console.log("Submit login:", state);
-    // setState(initialState);
+    onClearPostInfo();
+  };
+
+  const onClearPostInfo = () => {
+    setIsReadyPost(true);
+    setPhoto(null);
+    setLocation(null);
+    setAdress(null);
   };
 
   const onPressWithoutFeedback = () => {
     setIsShowKeyboard(false);
-    // setActiveInput({});
+
     Keyboard.dismiss();
   };
+
+  if (hasPermission === null) {
+    return <View style={{}} />;
+  }
+
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   return (
     <TouchableWithoutFeedback onPress={onPressWithoutFeedback}>
       <View style={styles.container}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : ""}>
-          <View
+          <Camera
             style={{ ...styles.photoBox, marginTop: isShowKeyboard ? 5 : 32 }}
+            ref={setCamera}
           >
-            <Image source={require("../../assets/circle.png")}></Image>
-          </View>
+            {photo && (
+              <View style={{ height: "100%", width: "100%" }}>
+                <Image
+                  source={{ uri: photo }}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </View>
+            )}
 
-          <Text style={styles.downloadPhoto}>Завантажте фото..</Text>
+            <TouchableOpacity
+              onPress={takePhoto}
+              style={{ position: "absolute" }}
+            >
+              <Image
+                style={{ opacity: 0.4 }}
+                source={require("../../assets/circle.png")}
+              ></Image>
+            </TouchableOpacity>
+          </Camera>
+
+          <Text style={styles.downloadPhoto}>
+            {photo ? "Редагувати фото.." : "Завантажте фото.."}
+          </Text>
 
           <View
             style={{
@@ -59,10 +135,8 @@ export const CreatePostsScreen = () => {
               onFocus={() => {
                 setIsShowKeyboard(true);
               }}
-              value={state.title}
-              onChangeText={(value) =>
-                setState((prevState) => ({ ...prevState, title: value }))
-              }
+              value={adress && adress.street}
+              disabled={true}
             />
           </View>
           <View
@@ -75,13 +149,13 @@ export const CreatePostsScreen = () => {
               style={styles.input}
               placeholder={"Місцевість..."}
               placeholderTextColor={"#BDBDBD"}
+              value={
+                adress &&
+                `${adress.city}, ${adress.country}, ${adress.isoCountryCode}`
+              }
               onFocus={() => {
                 setIsShowKeyboard(true);
               }}
-              value={state.location}
-              onChangeText={(value) =>
-                setState((prevState) => ({ ...prevState, location: value }))
-              }
             />
           </View>
 
@@ -90,17 +164,43 @@ export const CreatePostsScreen = () => {
             style={{
               ...styles.btnSubmit,
               marginTop: isShowKeyboard ? 10 : 20,
+              backgroundColor: isReadyPost ? "#F6F6F6" : "#FF6C00",
             }}
             onPress={onPressSubmit}
+            disabled={isReadyPost}
           >
-            <Text style={styles.btnSubmitTitle}>Опубліковати</Text>
+            <Text
+              style={{
+                ...styles.btnSubmitTitle,
+                color: isReadyPost ? "#BDBDBD" : "white",
+              }}
+            >
+              Опубліковати
+            </Text>
           </TouchableOpacity>
+
+          <View
+            style={{
+              marginTop: 300,
+              position: "absolute",
+              left: 90,
+              display: loader ? "flex" : "none",
+            }}
+          >
+            <Image
+              style={{ width: 150, height: 150 }}
+              source={require("../../assets/images/loader.gif")}
+            ></Image>
+          </View>
 
           <View style={{ alignItems: "center", marginTop: 35 }}>
             <TouchableOpacity
               activeOpacity={0.8}
-              style={styles.btnDelete}
-              // onPress={onPressDelete}
+              style={{
+                ...styles.btnDelete,
+                backgroundColor: photo ? "#FF6C00" : "#F6F6F6",
+              }}
+              onPress={onClearPostInfo}
             >
               <Image source={require("../../assets/trash.png")}></Image>
             </TouchableOpacity>
@@ -117,15 +217,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: "white",
   },
+
   photoBox: {
     height: 240,
     borderRadius: 8,
+    overflow: "hidden",
     backgroundColor: "#F6F6F6",
     borderWidth: 1,
     borderColor: "#E8E8E8",
     justifyContent: "center",
     alignItems: "center",
   },
+
   downloadPhoto: {
     marginTop: 8,
     fontSize: 16,
@@ -141,21 +244,18 @@ const styles = StyleSheet.create({
     height: 51,
     borderRadius: 20,
     alignItems: "center",
-    backgroundColor: "#F6F6F6",
     justifyContent: "center",
   },
   btnSubmitTitle: {
     fontSize: 16,
-    color: "#BDBDBD",
   },
   btnDelete: {
-    marginTop: 20,
+    marginTop: 10,
     height: 51,
     width: 70,
     marginHorizontal: "auto",
     borderRadius: 20,
     alignItems: "center",
-    backgroundColor: "#F6F6F6",
     justifyContent: "center",
   },
 });
