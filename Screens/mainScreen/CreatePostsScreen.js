@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   View,
   Text,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
+import db from "../../firebase/config";
 
 export default CreatePostsScreen = ({ navigation }) => {
   const [isReadyPost, setIsReadyPost] = useState(true);
@@ -23,6 +25,8 @@ export default CreatePostsScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [adress, setAdress] = useState(null);
   const [loader, setLoader] = useState(false);
+
+  const { userId, login } = useSelector((state) => state.auth);
 
   useEffect(() => {
     (async () => {
@@ -63,10 +67,39 @@ export default CreatePostsScreen = ({ navigation }) => {
   };
 
   const onPressSubmit = () => {
+    uploadPostToServer();
+
     onPressWithoutFeedback();
-    navigation.navigate("DefaultScreen", { photo, location, adress });
+    navigation.navigate("DefaultScreen");
 
     onClearPostInfo();
+  };
+
+  const uploadPostToServer = async () => {
+    const photoDb = await uploadPhotoToServer();
+
+    await db
+      .firestore()
+      .collection("posts")
+      .add({ photoDb, location, adress, userId, login });
+    console.log("Upload GOOD");
+  };
+
+  const uploadPhotoToServer = async () => {
+    const response = await fetch(photo);
+    const file = await response.blob();
+
+    const uniquePostId = Date.now().toString();
+
+    await db.storage().ref(`postImage/${uniquePostId}`).put(file);
+
+    const processedPhoto = await db
+      .storage()
+      .ref("postImage")
+      .child(uniquePostId)
+      .getDownloadURL();
+
+    return processedPhoto;
   };
 
   const onClearPostInfo = () => {

@@ -1,15 +1,14 @@
 import React from "react";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 const AuthStack = createNativeStackNavigator();
 
 import Home from "./Screens/mainScreen/Home";
 import LoginScreen from "./Screens/auth/LoginScreen";
 import RegistrationScreen from "./Screens/auth/RegistrationScreen";
 
-export default useRoute = (isAuth) => {
-  if (isAuth) {
+export const useRoute = (isAuth) => {
+  if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Login">
         <AuthStack.Screen
@@ -36,4 +35,16 @@ export default useRoute = (isAuth) => {
       </AuthStack.Navigator>
     );
   }
+
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="Home"
+        component={Home}
+      />
+    </AuthStack.Navigator>
+  );
 };

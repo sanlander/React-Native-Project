@@ -13,6 +13,9 @@ import {
   Dimensions,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignInUser } from "../../redux/auth/authOperations";
+
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -36,6 +39,8 @@ export default LoginScreen = ({ navigation }) => {
   const [activeInput, setActiveInput] = useState({});
   const [isSecurePassword, setIsSecurePassword] = useState(true);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const subscription = Dimensions.addEventListener("change", ({ window }) => {
       const widthNew = window.width - 16 * 2;
@@ -57,11 +62,10 @@ export default LoginScreen = ({ navigation }) => {
   }
 
   const onPressSubmit = () => {
-    navigation.push("Home");
-
     onPressWithoutFeedback();
 
-    console.log("Submit login:", state);
+    dispatch(authSignInUser(state));
+
     setState(initialState);
   };
 

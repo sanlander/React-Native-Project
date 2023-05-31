@@ -2,13 +2,23 @@ import React from "react";
 import { StyleSheet, Image, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
-import ProfileScreen from "./ProfileScreen";
+import ProfileScreen from "../mainScreen/ProfileScreen";
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
+import { useDispatch } from "react-redux";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 const MainTab = createBottomTabNavigator();
 
 export default Home = ({ navigation }) => {
+  const dispatch = useDispatch();
+
+  const signOut = () => {
+    dispatch(authSignOutUser());
+
+    navigation.navigate("Login");
+  };
+
   return (
     <MainTab.Navigator
       screenOptions={{
@@ -23,10 +33,7 @@ export default Home = ({ navigation }) => {
             fontSize: 17,
           },
           headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 10 }}
-              onPress={() => navigation.push("Login")}
-            >
+            <TouchableOpacity style={{ marginRight: 10 }} onPress={signOut}>
               <Image
                 source={require("../../assets/images/log-out.png")}
               ></Image>

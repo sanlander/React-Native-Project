@@ -13,9 +13,12 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
+import { useDispatch } from "react-redux";
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+
+import { authSignUpUser } from "../../redux/auth/authOperations";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,6 +41,8 @@ export default RegistrationScreen = ({ navigation }) => {
   const [activeInput, setActiveInput] = useState({});
   const [isSecurePassword, setIsSecurePassword] = useState(true);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const subscription = Dimensions.addEventListener("change", ({ window }) => {
       const widthNew = window.width - 16 * 2;
@@ -59,10 +64,10 @@ export default RegistrationScreen = ({ navigation }) => {
   }
 
   const onPressSubmit = () => {
-    navigation.push("Home");
     onPressWithoutFeedback();
 
-    console.log("Submit register:", state);
+    dispatch(authSignUpUser(state));
+
     setState(initialState);
   };
 

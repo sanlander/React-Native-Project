@@ -8,16 +8,23 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-export default DefaultScreenPosts = ({ route, navigation }) => {
+import db from "../../firebase/config";
+
+const DefaultScreenPosts = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
-  console.log("route.params", route.params);
+
+  const getAllPost = async () => {
+    await db
+      .firestore()
+      .collection("posts")
+      .onSnapshot((data) =>
+        setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+      );
+  };
 
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
-    }
-  }, [route.params]);
-  console.log("posts", posts);
+    getAllPost();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -48,7 +55,7 @@ export default DefaultScreenPosts = ({ route, navigation }) => {
             <View style={styles.post}>
               <Image
                 style={styles.postImg}
-                source={{ uri: item.photo }}
+                source={{ uri: item.photoDb }}
               ></Image>
 
               <Text style={styles.posTitle}>{item.adress.street}</Text>
@@ -56,7 +63,9 @@ export default DefaultScreenPosts = ({ route, navigation }) => {
               <View style={styles.description}>
                 <View style={styles.comments}>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("Comments")}
+                    onPress={() =>
+                      navigation.navigate("Comments", { postId: item.id })
+                    }
                   >
                     <Image
                       style={{ marginRight: 8 }}
@@ -85,7 +94,7 @@ export default DefaultScreenPosts = ({ route, navigation }) => {
                     ></Image>
                   </TouchableOpacity>
                   <Text style={styles.locationText}>
-                    {`${item.adress.city}, ${item.adress.country}, ${item.adress.isoCountryCode}`}
+                    {`${item.adress.city}, ${item.adress.country}`}
                   </Text>
                 </View>
               </View>
@@ -153,3 +162,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+export default DefaultScreenPosts;
