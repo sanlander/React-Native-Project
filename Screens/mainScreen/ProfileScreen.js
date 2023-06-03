@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+} from "react-native";
 import { useSelector } from "react-redux";
 import db from "../../firebase/config";
 
-const ProfileScreen = ({navigation}) => {
+const ProfileScreen = ({ navigation }) => {
   const [userPosts, setUserPosts] = useState([]);
   const { userId } = useSelector((state) => state.auth);
 
@@ -23,7 +30,7 @@ const ProfileScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-       <FlatList
+      <FlatList
         data={userPosts}
         keyExtractor={(item, indx) => indx.toString()}
         renderItem={({ item }) => (
@@ -34,14 +41,12 @@ const ProfileScreen = ({navigation}) => {
                 source={{ uri: item.photoDb }}
               ></Image>
 
-              <Text style={styles.posTitle}>{item.adress.street}</Text>
+              <Text style={styles.posTitle}>{item.title}</Text>
 
               <View style={styles.description}>
                 <View style={styles.comments}>
                   <TouchableOpacity
-                    onPress={() =>
-                       navigation.navigate("DefaultScreen")
-                    }
+                    onPress={() => navigation.navigate("DefaultScreen")}
                   >
                     <Image
                       style={{ marginRight: 8 }}
@@ -60,9 +65,7 @@ const ProfileScreen = ({navigation}) => {
 
                 <View style={styles.location}>
                   <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("DefaultScreen")
-                    }
+                    onPress={() => navigation.navigate("DefaultScreen")}
                   >
                     <Image
                       style={{ marginRight: 8 }}
@@ -120,7 +123,6 @@ const styles = StyleSheet.create({
     color: "#212121",
     textDecorationLine: "underline",
   },
-
 });
 
 export default ProfileScreen;

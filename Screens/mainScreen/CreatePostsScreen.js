@@ -25,6 +25,7 @@ export default CreatePostsScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [adress, setAdress] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [title, setTitle] = useState("");
 
   const { userId, login } = useSelector((state) => state.auth);
 
@@ -81,8 +82,8 @@ export default CreatePostsScreen = ({ navigation }) => {
     await db
       .firestore()
       .collection("posts")
-      .add({ photoDb, location, adress, userId, login });
-    console.log("Upload GOOD");
+      .add({ photoDb, location, adress, userId, login, title });
+    console.log("Upload success");
   };
 
   const uploadPhotoToServer = async () => {
@@ -107,6 +108,7 @@ export default CreatePostsScreen = ({ navigation }) => {
     setPhoto(null);
     setLocation(null);
     setAdress(null);
+    setTitle("");
   };
 
   const onPressWithoutFeedback = () => {
@@ -168,8 +170,8 @@ export default CreatePostsScreen = ({ navigation }) => {
               onFocus={() => {
                 setIsShowKeyboard(true);
               }}
-              value={adress && adress.street}
-              disabled={true}
+              value={title}
+              onChangeText={(value) => setTitle(value)}
             />
           </View>
           <View

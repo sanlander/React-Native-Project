@@ -58,7 +58,7 @@ const DefaultScreenPosts = ({ navigation }) => {
                 source={{ uri: item.photoDb }}
               ></Image>
 
-              <Text style={styles.posTitle}>{item.adress.street}</Text>
+              <Text style={styles.posTitle}>{item.title}</Text>
 
               <View style={styles.description}>
                 <View style={styles.comments}>
